@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "800843633534",
+    "project_id": "kickboard-1164e",
+    "storage_bucket": "kickboard-1164e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:800843633534:android:6f8613b062a52bf0a4992f",
+        "android_client_info": {
+          "package_name": "com.example.kickboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "800843633534-shhl9pgt38netl4obe67mi7mmfbb0r5i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kickboard",
+            "certificate_hash": "36857b6c2ea47b2fd9a8fbd7e2216be3c6fd6a64"
+          }
+        },
+        {
+          "client_id": "800843633534-6cs5q8vkqhf6trnhm39mi169vhfhacem.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3DDhBaptCI1DzgAEmb7xFqTba_lDZ3SE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "800843633534-6cs5q8vkqhf6trnhm39mi169vhfhacem.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
