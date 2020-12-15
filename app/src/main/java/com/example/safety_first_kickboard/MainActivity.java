@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
-
     //그냥 공공데이터 받아와서 출력 볼려고 만든 함수 이며 실제적으로 필요한 데이터 짤라서 저장하는건 parseData에서 실행
     // 1.지자체별 사고 다발 지역 정보
     private void makeUrl(){
@@ -165,9 +164,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     // 3.공사정보
-    private void makeUrl3(String minX,String maxX,String minY,String maxY){
+    private void makeUrl3(double minX,double maxX,double minY,double maxY){
         URL url;
         StringBuilder urlBuilder = new StringBuilder("http://openapi.its.go.kr:8082/api/NEventIdentity");
+
         try{ // URI만들기(GET형식 요청보내기)
             urlBuilder.append("?"+ URLEncoder.encode("key","UTF-8")+"=1607884783718");
             urlBuilder.append("&"+URLEncoder.encode("ReqType","UTF-8")+"=2");//boundary 요청여부(2)
@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     // 4.사고정보
-    private void makeUrl4(String minX,String maxX,String minY,String maxY){
+    private void makeUrl4(double minX,double maxX,double minY,double maxY){
         URL url;
         StringBuilder urlBuilder = new StringBuilder("http://openapi.its.go.kr:8082/api/NIncidentIdentity");
         try{ // URI만들기(GET형식 요청보내기)
@@ -457,6 +457,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         double latitude = gpsTracker.getLatitude(); // 위도
         double longitude = gpsTracker.getLongitude(); //경도
 
+
+        double diffLatitude = LatitudeInDifference(1000); //현위치 기준 반경 1000m
+        double diffLongitude = LongitudeInDifference(latitude, 1000);
+
+        double minlon = longitude-diffLongitude;
+        double maxlon = longitude+diffLongitude;
+        double minlat = latitude-diffLatitude;
+        double maxlat = latitude+diffLatitude;
+
+
+        //바뀐 위경도(현위치 +xm, -xm) 확인용 출력
+        /*System.out.println("출력확인 변경된 위도 = " + minlat + "~"+ maxlat);
+        System.out.println("출력확인 변경된 경도 = " + minlon + "~"+ maxlon);*/
+
         String address = getCurrentAddress(latitude, longitude); //위경도 기반 주소
 
         Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude + "\n주소:" + address, Toast.LENGTH_LONG).show();
@@ -473,17 +487,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new Thread(){
                     @Override
                     public void run() {
-                        super.run();
+                       super.run();
+                        /*Log.d("service","*****지자체*****");
                         makeUrl();
                         Log.d("service","*****자전거*****");
-                        makeUrl2();
+                        makeUrl2();*/
                         Log.d("service","*****공사*****");
-                        makeUrl3(""+127.100000,""+128.890000,""+34.100000,""+39.100000);
+                        makeUrl3(+127.100000,+128.890000,+34.100000,+35.100000);//이러면 3개뜸
+                        //makeUrl3(minlon,maxlon,minlat,maxlat); (데이터의 갯수가 넘 작아서 걍 현위치 주변은 안떠ㅜ)
                         Log.d("service","*****사고*****");
-                        makeUrl4(""+127.100000,""+128.890000,""+34.100000,""+39.100000);
+                        makeUrl4(+127.100000,+128.890000,+34.100000,+39.100000); //디폴트로 넣어도 1개,,, 양이 작음
+                        //makeUrl4(minlon,maxlon,minlat,maxlat); (데이터의 갯수가 넘 작아서 걍 현위치 주변은 안떠ㅜ)
                     }
                 }.start();
             }
+
         });
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -493,6 +511,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+    }
+
+    //반경 m이내의 위도차(degree)
+    public double LatitudeInDifference(int diff){
+        //지구반지름
+        final int earth = 6371000;    //단위m
+
+        return (diff*360.0) / (2*Math.PI*earth);
+    }
+
+    //반경 m이내의 경도차(degree)
+    public double LongitudeInDifference(double _latitude, int diff){
+        //지구반지름
+        final int earth = 6371000;    //단위m
+
+        double ddd = Math.cos(0);
+        double ddf = Math.cos(Math.toRadians(_latitude));
+
+        return (diff*360.0) / (2*Math.PI*earth*Math.cos(Math.toRadians(_latitude)));
     }
 
     @Override
@@ -682,6 +719,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(@NonNull NaverMap naverMap) {
         this.naverMap = naverMap;
+
+        Marker marker = new Marker();
+        marker.setPosition(new LatLng(37.5670135, 126.9783740));
+        marker.setMap(naverMap);
 
        /* double latitude = gpsTracker.getLatitude(); // 위도
         double longitude = gpsTracker.getLongitude(); //경도*/
