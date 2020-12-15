@@ -457,15 +457,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         double latitude = gpsTracker.getLatitude(); // 위도
         double longitude = gpsTracker.getLongitude(); //경도
 
+        String address = getCurrentAddress(latitude, longitude); //위경도 기반 주소
+
+        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude + "\n주소:" + address, Toast.LENGTH_LONG).show();
+
         //네이버 지도
         mapView = (MapView) findViewById(R.id.map_fragment);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
-
-
-        String address = getCurrentAddress(latitude, longitude); //위경도 기반 주소
-
-        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude + "\n주소:" + address, Toast.LENGTH_LONG).show();
 
         //btn 누르면 데이터 파싱
         btn.setOnClickListener(new View.OnClickListener() {
