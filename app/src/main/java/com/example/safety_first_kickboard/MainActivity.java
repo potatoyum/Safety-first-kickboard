@@ -124,17 +124,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 3.공사정보
-    private void makeUrl3(){
+    private void makeUrl3(String minX,String maxX,String minY,String maxY){
         URL url;
         StringBuilder urlBuilder = new StringBuilder("http://openapi.its.go.kr:8082/api/NEventIdentity");
         try{ // URI만들기(GET형식 요청보내기)
             urlBuilder.append("?"+ URLEncoder.encode("key","UTF-8")+"=1607884783718");
             urlBuilder.append("&"+URLEncoder.encode("ReqType","UTF-8")+"=2");//boundary 요청여부(2)
             //urlBuilder.append("&"+URLEncoder.encode("Eventidentity","UTF-8")+"=230");
-            urlBuilder.append("&"+URLEncoder.encode("MinX","UTF-8")+"=127.100000");//경도 min
-            urlBuilder.append("&"+URLEncoder.encode("MaxX","UTF-8")+"=128.890000");//경도 max
-            urlBuilder.append("&"+URLEncoder.encode("MinY","UTF-8")+"=34.100000");//위도 min
-            urlBuilder.append("&"+URLEncoder.encode("MaxY","UTF-8")+"=39.100000");//위도 min
+            urlBuilder.append("&"+URLEncoder.encode("MinX","UTF-8")+"="+minX);//경도 min
+            urlBuilder.append("&"+URLEncoder.encode("MaxX","UTF-8")+"="+maxX);//경도 max
+            urlBuilder.append("&"+URLEncoder.encode("MinY","UTF-8")+"="+minY);//위도 min
+            urlBuilder.append("&"+URLEncoder.encode("MaxY","UTF-8")+"="+maxY);//위도 min
             urlBuilder.append("&"+URLEncoder.encode("type","UTF-8")+"=its");// 공사정보(국도)
         }catch (Exception e){
             Log.d("service","ServiceKey error");
@@ -174,17 +174,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 4.사고정보
-    private void makeUrl4(){
+    private void makeUrl4(String minX,String maxX,String minY,String maxY){
         URL url;
         StringBuilder urlBuilder = new StringBuilder("http://openapi.its.go.kr:8082/api/NIncidentIdentity");
         try{ // URI만들기(GET형식 요청보내기)
             urlBuilder.append("?"+ URLEncoder.encode("key","UTF-8")+"=1607884783718");
             urlBuilder.append("&"+URLEncoder.encode("ReqType","UTF-8")+"=2");//boundary 요청여부(2)
             //urlBuilder.append("&"+URLEncoder.encode("Eventidentity","UTF-8")+"=230");
-            urlBuilder.append("&"+URLEncoder.encode("MinX","UTF-8")+"=127.100000");//경도 min
-            urlBuilder.append("&"+URLEncoder.encode("MaxX","UTF-8")+"=128.890000");//경도 max
-            urlBuilder.append("&"+URLEncoder.encode("MinY","UTF-8")+"=34.100000");//위도 min
-            urlBuilder.append("&"+URLEncoder.encode("MaxY","UTF-8")+"=39.100000");//위도 min
+            urlBuilder.append("&"+URLEncoder.encode("MinX","UTF-8")+"="+minX);//경도 min
+            urlBuilder.append("&"+URLEncoder.encode("MaxX","UTF-8")+"="+maxX);//경도 max
+            urlBuilder.append("&"+URLEncoder.encode("MinY","UTF-8")+"="+minY);//위도 min
+            urlBuilder.append("&"+URLEncoder.encode("MaxY","UTF-8")+"="+maxY);//위도 min
             urlBuilder.append("&"+URLEncoder.encode("type","UTF-8")+"=its");// 공사정보(국도)
         }catch (Exception e){
             Log.d("service","ServiceKey error");
@@ -415,9 +415,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("service","*****자전거*****");
                         makeUrl2();
                         Log.d("service","*****공사*****");
-                        makeUrl3();
+                        makeUrl3(""+127.100000,""+128.890000,""+34.100000,""+39.100000);
                         Log.d("service","*****사고*****");
-                        makeUrl4();
+                        makeUrl4(""+127.100000,""+128.890000,""+34.100000,""+39.100000);
                     }
                 }.start();
             }
