@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONArray;
@@ -12,7 +13,6 @@ import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             }
             rd.close();
             conn.disconnect();
-            parseData(sb,url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
+            parseData(url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
 
         }catch (Exception e){
             Log.d("service",e.toString());
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             }
             rd.close();
             conn.disconnect();
-            //parseData(sb,url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
+            parseData(url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
 
         }catch (Exception e){
             Log.d("service",e.toString());
@@ -132,8 +132,8 @@ public class MainActivity extends AppCompatActivity {
             urlBuilder.append("&"+URLEncoder.encode("ReqType","UTF-8")+"=2");//boundary 요청여부(2)
             //urlBuilder.append("&"+URLEncoder.encode("Eventidentity","UTF-8")+"=230");
             urlBuilder.append("&"+URLEncoder.encode("MinX","UTF-8")+"=127.100000");//경도 min
-            urlBuilder.append("&"+URLEncoder.encode("MaxX","UTF-8")+"=34.100000");//경도 max
-            urlBuilder.append("&"+URLEncoder.encode("MinY","UTF-8")+"=128.890000");//위도 min
+            urlBuilder.append("&"+URLEncoder.encode("MaxX","UTF-8")+"=128.890000");//경도 max
+            urlBuilder.append("&"+URLEncoder.encode("MinY","UTF-8")+"=34.100000");//위도 min
             urlBuilder.append("&"+URLEncoder.encode("MaxY","UTF-8")+"=39.100000");//위도 min
             urlBuilder.append("&"+URLEncoder.encode("type","UTF-8")+"=its");// 공사정보(국도)
         }catch (Exception e){
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
             }
             rd.close();
             conn.disconnect();
-            //parseData(sb,url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
+            work_parseData(url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
 
         }catch (Exception e){
             Log.d("service",e.toString());
@@ -176,14 +176,14 @@ public class MainActivity extends AppCompatActivity {
     // 4.사고정보
     private void makeUrl4(){
         URL url;
-        StringBuilder urlBuilder = new StringBuilder("http://openapi.its.go.kr:8082/api/NEventIdentity");
+        StringBuilder urlBuilder = new StringBuilder("http://openapi.its.go.kr:8082/api/NIncidentIdentity");
         try{ // URI만들기(GET형식 요청보내기)
             urlBuilder.append("?"+ URLEncoder.encode("key","UTF-8")+"=1607884783718");
             urlBuilder.append("&"+URLEncoder.encode("ReqType","UTF-8")+"=2");//boundary 요청여부(2)
             //urlBuilder.append("&"+URLEncoder.encode("Eventidentity","UTF-8")+"=230");
             urlBuilder.append("&"+URLEncoder.encode("MinX","UTF-8")+"=127.100000");//경도 min
-            urlBuilder.append("&"+URLEncoder.encode("MaxX","UTF-8")+"=34.100000");//경도 max
-            urlBuilder.append("&"+URLEncoder.encode("MinY","UTF-8")+"=128.890000");//위도 min
+            urlBuilder.append("&"+URLEncoder.encode("MaxX","UTF-8")+"=128.890000");//경도 max
+            urlBuilder.append("&"+URLEncoder.encode("MinY","UTF-8")+"=34.100000");//위도 min
             urlBuilder.append("&"+URLEncoder.encode("MaxY","UTF-8")+"=39.100000");//위도 min
             urlBuilder.append("&"+URLEncoder.encode("type","UTF-8")+"=its");// 공사정보(국도)
         }catch (Exception e){
@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
             }
             rd.close();
             conn.disconnect();
-            //parseData(sb,url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
+            Incident_parseData(url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
 
         }catch (Exception e){
             Log.d("service",e.toString());
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void parseData(StringBuilder data,URL url){ //받아와서 데이터 파싱하기
+    private void parseData(URL url){ //받아와서 데이터 파싱하기
         JSONArray jsonArray = new JSONArray();
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -237,35 +237,41 @@ public class MainActivity extends AppCompatActivity {
             boolean laBool = false;//위도
 
             while (eventType != XmlPullParser.END_DOCUMENT) { // START_TAG는 태그의 시작부분, TEXT는 태그안에 있는  데이터
-                JSONObject jsonObject = new JSONObject();
-
+                //JSONObject jsonObject = new JSONObject();
                 if (eventType == XmlPullParser.START_TAG) {
                     if (xpp.getName().equals("spot_nm")) { // 태그가 spot_nm으로 시작하면 spotBool값 true로 바꾸기
                         spotBool = true;
                     }
-                    if (xpp.getName().equals("lo_crd")) { // 태그가 lo_crd으로 시작하면 spotBool값 true로 바꾸기
+                    else if (xpp.getName().equals("lo_crd")) { // 태그가 lo_crd으로 시작하면 spotBool값 true로 바꾸기
                         loBool = true;
+                    }
+                    else if (xpp.getName().equals("la_crd")) { // 태그가 la_crd으로 시작하면 spotBool값 true로 바꾸기
+                        laBool = true;
                     }
                 } else if (eventType == XmlPullParser.TEXT) { //
                     if (spotBool) { // spot_nm 태그에 해당하는 값이면 실행한다.
                         spotBool = false;
-                        //JSONObject jsonObject = new JSONObject();
+                        JSONObject jsonObject = new JSONObject();
                         jsonObject.put("spot_nm", xpp.getText());
-                        //jsonArray.put(jsonObject);
+                        jsonArray.put(jsonObject);
                     }
-                    if (loBool) { // la_crd 태그에 해당하는 값이면 실행한다.
+                    else if (loBool) { // la_crd 태그에 해당하는 값이면 실행한다.
                         loBool = false;
-                        jsonObject.put("lo_crd", xpp.getText());
+                        JSONObject jsonObject = (JSONObject)jsonArray.get(jsonArray.length()-1);
+                        jsonObject.put("lo_crd",xpp.getText());
                     }
-                    jsonArray.put(jsonObject);
+                    else if(laBool){
+                        laBool = false;
+                        JSONObject jsonObject = (JSONObject)jsonArray.get(jsonArray.length()-1);
+                        jsonObject.put("la_crd",xpp.getText());
+
+                    }
                 }
                 eventType = xpp.next();
             }
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-                Log.d("service", "" + jsonObject.keys() + " : " + jsonObject.get("spot_nm")); //사고다발구간 명칭
-                String longitude = jsonObject.getString("lo_crd");
-                Log.d("service", "위도:" + longitude);
+                Log.d("service",""+jsonObject.keys()+" : "+jsonObject.get("spot_nm")+" "+jsonObject.get("lo_crd")+" "+jsonObject.get("la_crd"));
             }
         }
         catch (Exception e){
@@ -273,6 +279,120 @@ public class MainActivity extends AppCompatActivity {
             Log.e("service",e.toString());
         }
 
+    }
+
+    private void work_parseData(URL url){ //받아와서 데이터 파싱하기
+        JSONArray jsonArray = new JSONArray();
+        try {
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            XmlPullParser xpp = factory.newPullParser();
+            InputStream is = url.openStream();
+            xpp.setInput(new InputStreamReader(is, "UTF-8")); //xml 데이터 받아오기
+            int eventType = xpp.getEventType();
+
+            boolean EventBool = false;// 장소이름
+            boolean XBool = false;// 경도
+            boolean YBool = false;//위도
+
+            while (eventType != XmlPullParser.END_DOCUMENT) { // START_TAG는 태그의 시작부분, TEXT는 태그안에 있는  데이터
+                //JSONObject jsonObject = new JSONObject();
+                if (eventType == XmlPullParser.START_TAG) {
+                    if (xpp.getName().equals("eventstatusmsg")) { // 태그가 spot_nm으로 시작하면 spotBool값 true로 바꾸기
+                        EventBool = true;
+                    }
+                    else if (xpp.getName().equals("coordx")) { // 태그가 lo_crd으로 시작하면 spotBool값 true로 바꾸기
+                        XBool = true;
+                    }
+                    else if (xpp.getName().equals("coordy")) { // 태그가 la_crd으로 시작하면 spotBool값 true로 바꾸기
+                        YBool = true;
+                    }
+                } else if (eventType == XmlPullParser.TEXT) { //
+                    if(YBool){ // YBool 태그에 해당하는 값이면 실행한다.
+                        YBool = false;
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("CoordY",xpp.getText());
+                        jsonArray.put(jsonObject);
+                    }
+                    else if (XBool) { // XBool 태그에 해당하는 값이면 실행한다.
+                        XBool = false;
+                        JSONObject jsonObject = (JSONObject)jsonArray.get(jsonArray.length()-1);
+                        jsonObject.put("CoordX",xpp.getText());
+                    }
+                    else if (EventBool) { // EventBool 태그에 해당하는 값이면 실행한다.
+                        EventBool = false;
+                        JSONObject jsonObject = (JSONObject)jsonArray.get(jsonArray.length()-1);
+                        jsonObject.put("EventStatusMsg", xpp.getText());
+
+                    }
+                }
+                eventType = xpp.next();
+            }
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+                Log.d("service",""+jsonObject.keys()+" : "+jsonObject.get("EventStatusMsg")+" "+jsonObject.get("CoordX")+" "+jsonObject.get("CoordY"));
+            }
+        }
+        catch (Exception e){
+            Log.d("service","Data parser error.");
+            Log.e("service",e.toString());
+        }
+    }
+
+    private void Incident_parseData(URL url){ //받아와서 데이터 파싱하기
+        JSONArray jsonArray = new JSONArray();
+        try {
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            XmlPullParser xpp = factory.newPullParser();
+            InputStream is = url.openStream();
+            xpp.setInput(new InputStreamReader(is, "UTF-8")); //xml 데이터 받아오기
+            int eventType = xpp.getEventType();
+
+            boolean EventBool = false;// 장소이름
+            boolean XBool = false;// 경도
+            boolean YBool = false;//위도
+
+            while (eventType != XmlPullParser.END_DOCUMENT) { // START_TAG는 태그의 시작부분, TEXT는 태그안에 있는  데이터
+                //JSONObject jsonObject = new JSONObject();
+                if (eventType == XmlPullParser.START_TAG) {
+                    if (xpp.getName().equals("incidentmsg")) { // 태그가 spot_nm으로 시작하면 spotBool값 true로 바꾸기
+                        EventBool = true;
+                    }
+                    else if (xpp.getName().equals("coordy")) { // 태그가 lo_crd으로 시작하면 spotBool값 true로 바꾸기
+                        YBool = true;
+                    }
+                    else if (xpp.getName().equals("coordx")) { // 태그가 la_crd으로 시작하면 spotBool값 true로 바꾸기
+                        XBool = true;
+                    }
+                } else if (eventType == XmlPullParser.TEXT) { //
+                    if(EventBool){ // YBool 태그에 해당하는 값이면 실행한다.
+                        EventBool = false;
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("IncidentMsg",xpp.getText());
+                        jsonArray.put(jsonObject);
+                    }
+                    else if (YBool) { // XBool 태그에 해당하는 값이면 실행한다.
+                        YBool = false;
+                        JSONObject jsonObject = (JSONObject)jsonArray.get(jsonArray.length()-1);
+                        jsonObject.put("CoordY",xpp.getText());
+                    }
+                    else if (XBool) { // EventBool 태그에 해당하는 값이면 실행한다.
+                        XBool = false;
+                        JSONObject jsonObject = (JSONObject)jsonArray.get(jsonArray.length()-1);
+                        jsonObject.put("CoordX", xpp.getText());
+
+                    }
+                }
+                eventType = xpp.next();
+            }
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+                Log.d("service",""+jsonObject.keys()+" : "+jsonObject.get("IncidentMsg")+" "+jsonObject.get("CoordX")+" "+jsonObject.get("CoordY"));
+            }
+        }
+        catch (Exception e){
+            Log.d("service","Data parser error.");
+            Log.e("service",e.toString());
+        }
     }
 
     @Override
