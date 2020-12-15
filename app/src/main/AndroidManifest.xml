@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Safety_first_kickboard"
         android:usesCleartextTraffic="true">
+
         <activity android:name=".MainActivity2"></activity>
 
         <meta-data
@@ -26,5 +27,7 @@
             </intent-filter>
         </activity>
     </application>
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 </manifest>
