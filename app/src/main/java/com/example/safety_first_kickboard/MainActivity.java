@@ -29,6 +29,7 @@ import android.content.DialogInterface;
 
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraPosition;
+import com.naver.maps.map.MapFragment;
 import com.naver.maps.map.MapView;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
@@ -41,6 +42,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,8 +59,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Button btn;
     private Button nextBtn;
 
-    private MapView mapView;
-    private static NaverMap naverMap;
+//    private MapView mapView;
+//    private static NaverMap naverMap;
     private GpsTracker gpsTracker;
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -475,11 +478,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude + "\n주소:" + address, Toast.LENGTH_LONG).show();
 
+
+        NaverMapFragment naverMapFragment = new NaverMapFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, naverMapFragment).commit();
+
         //네이버 지도
-        mapView = (MapView) findViewById(R.id.map_fragment);
+       /* mapView = (MapView) findViewById(R.id.map_fragment);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
+        FragmentManager fm = getSupportFragmentManager();
+        MapFragment mapFragment = (MapFragment)fm.findFragmentById(R.id.map_fragment);
+        if (mapFragment == null) {
+            mapFragment = MapFragment.newInstance();
+            fm.beginTransaction().add(R.id.map, mapFragment).commit();
+        }
+
+
+        */
         //btn 누르면 데이터 파싱
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -506,8 +522,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),MainActivity2.class);
-                startActivity(intent);
+                //Intent intent = new Intent(getApplicationContext(),MainActivity2.class);
+               // startActivity(intent);
 
             }
         });
@@ -699,7 +715,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (checkLocationServicesStatus()) {
                     if (checkLocationServicesStatus()) {
 
-                        Log.d("@@@", "onActivityResult : GPS 활성화 되있음");
+                        Log.d("@@@", "onActivityResult : GPS 활성화 되어있음");
                         checkRunTimePermission();
                         return;
                     }
@@ -717,15 +733,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onMapReady(@NonNull NaverMap naverMap) {
-        this.naverMap = naverMap;
+    public void onMapReady(@NonNull NaverMap naverMap){
 
         Marker marker = new Marker();
         marker.setPosition(new LatLng(37.5670135, 126.9783740));
         marker.setMap(naverMap);
 
-       /* double latitude = gpsTracker.getLatitude(); // 위도
-        double longitude = gpsTracker.getLongitude(); //경도*/
+//        double latitude = gpsTracker.getLatitude(); // 위도
+//        double longitude = gpsTracker.getLongitude(); //경도
 
         //이부분을 내가 못해서 느리게 지도가 뜨는것 같음
         CameraPosition cameraPosition = new CameraPosition(
@@ -733,6 +748,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 15 // 줌 레벨
         );
         naverMap.setCameraPosition(cameraPosition);
+
+
     }
 
 }

@@ -13,8 +13,6 @@
         android:theme="@style/Theme.Safety_first_kickboard"
         android:usesCleartextTraffic="true">
 
-        <activity android:name=".MainActivity2"></activity>
-
         <meta-data
             android:name="com.naver.maps.map.CLIENT_ID"
             android:value="dp99vms63h" />
