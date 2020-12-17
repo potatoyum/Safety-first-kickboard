@@ -1,5 +1,6 @@
 package com.example.safety_first_kickboard;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,6 +40,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     NaverMap naverMap;
     FusedLocationSource locationSource;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
+    Double latitude, longitude, minlat, maxlat, minlon, maxlon;
 
     //그냥 공공데이터 받아와서 출력 볼려고 만든 함수 이며 실제적으로 필요한 데이터 짤라서 저장하는건 parseData에서 실행
     // 1.지자체별 사고 다발 지역 정보
@@ -49,7 +51,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             urlBuilder.append("?"+ URLEncoder.encode("ServiceKey","UTF-8")+"=0MvIUe906%2FGQuhQtiBgXvDnORAxuFZjJZfU7U3%2BcnshFqhr8rKovyxud62403RMhZdIu4bxK1Bpqm8N88QbE0A%3D%3D");
             urlBuilder.append("&"+URLEncoder.encode("searchYearCd","UTF-8")+"=2018");
             urlBuilder.append("&"+URLEncoder.encode("siDo","UTF-8")+"=27");//시도코드(대구)
-            urlBuilder.append("&"+URLEncoder.encode("guGun","UTF-8")+"=230");//시군구코드(북구)
+            urlBuilder.append("&"+URLEncoder.encode("guGun","UTF-8")+"=110");//시군구코드(중구)
             //  urlBuilder.append("&"+URLEncoder.encode("type","UTF-8")+"=json");
             urlBuilder.append("&"+URLEncoder.encode("numOfRows","UTF-8")+"=10");//검색건수
             urlBuilder.append("&"+URLEncoder.encode("pageNo","UTF-8")+"=1");
@@ -81,7 +83,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             }
             rd.close();
             conn.disconnect();
-            parseData(url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
+            loc_parseData(url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
 
         }catch (Exception e){
             Log.d("service",e.toString());
@@ -98,7 +100,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             urlBuilder.append("?"+ URLEncoder.encode("ServiceKey","UTF-8")+"=0MvIUe906%2FGQuhQtiBgXvDnORAxuFZjJZfU7U3%2BcnshFqhr8rKovyxud62403RMhZdIu4bxK1Bpqm8N88QbE0A%3D%3D");
             urlBuilder.append("&"+URLEncoder.encode("searchYearCd","UTF-8")+"=2018");
             urlBuilder.append("&"+URLEncoder.encode("siDo","UTF-8")+"=27");//시도코드(대구)
-            urlBuilder.append("&"+URLEncoder.encode("guGun","UTF-8")+"=230");//시군구코드(북구)
+            urlBuilder.append("&"+URLEncoder.encode("guGun","UTF-8")+"=110");//시군구코드(중구)
             // urlBuilder.append("&"+URLEncoder.encode("type","UTF-8")+"=json");
             urlBuilder.append("&"+URLEncoder.encode("numOfRows","UTF-8")+"=10");//검색건수
             urlBuilder.append("&"+URLEncoder.encode("pageNo","UTF-8")+"=1");
@@ -130,7 +132,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             }
             rd.close();
             conn.disconnect();
-            parseData(url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
+            bike_parseData(url); // url로부터 데이터를 다시 받아와서 파싱하는 함수
 
         }catch (Exception e){
             Log.d("service",e.toString());
@@ -240,7 +242,8 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
-    private void parseData(URL url){ //받아와서 데이터 파싱하기
+    private void loc_parseData(URL url){ //받아와서 데이터 파싱하기
+        int type = 1;
         JSONArray jsonArray = new JSONArray();
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -290,12 +293,80 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                 JSONObject jsonObject = (JSONObject) jsonArray.get(i);
                 Log.d("service",""+jsonObject.keys()+" : "+jsonObject.get("spot_nm")+" "+jsonObject.get("lo_crd")+" "+jsonObject.get("la_crd"));
 
-                /*
+
                 String lat = (String)jsonObject.get("la_crd");
                 String lng = (String)jsonObject.get("lo_crd");
 
-                Marker(lat,lng); //마커 생성
-                */
+                if(minlat<=Double.parseDouble(lat) && maxlat>=Double.parseDouble(lat) && minlon<=Double.parseDouble(lng) && maxlon>=Double.parseDouble(lng)){
+                    Marker(type,Double.parseDouble(lat),Double.parseDouble(lng)); //마커 생성
+                }
+            }
+        }
+        catch (Exception e){
+            Log.d("service","Data parser error.");
+            Log.e("service",e.toString());
+        }
+
+    }
+
+    private void bike_parseData(URL url){ //받아와서 데이터 파싱하기
+        int type = 2;
+        JSONArray jsonArray = new JSONArray();
+        try {
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            XmlPullParser xpp = factory.newPullParser();
+            InputStream is = url.openStream();
+            xpp.setInput(new InputStreamReader(is, "UTF-8")); //xml 데이터 받아오기
+            int eventType = xpp.getEventType();
+
+            boolean spotBool = false;// 장소이름
+            boolean loBool = false;// 경도
+            boolean laBool = false;//위도
+
+            while (eventType != XmlPullParser.END_DOCUMENT) { // START_TAG는 태그의 시작부분, TEXT는 태그안에 있는  데이터
+                //JSONObject jsonObject = new JSONObject();
+                if (eventType == XmlPullParser.START_TAG) {
+                    if (xpp.getName().equals("spot_nm")) { // 태그가 spot_nm으로 시작하면 spotBool값 true로 바꾸기
+                        spotBool = true;
+                    }
+                    else if (xpp.getName().equals("lo_crd")) { // 태그가 lo_crd으로 시작하면 spotBool값 true로 바꾸기
+                        loBool = true;
+                    }
+                    else if (xpp.getName().equals("la_crd")) { // 태그가 la_crd으로 시작하면 spotBool값 true로 바꾸기
+                        laBool = true;
+                    }
+                } else if (eventType == XmlPullParser.TEXT) { //
+                    if (spotBool) { // spot_nm 태그에 해당하는 값이면 실행한다.
+                        spotBool = false;
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("spot_nm", xpp.getText());
+                        jsonArray.put(jsonObject);
+                    }
+                    else if (loBool) { // la_crd 태그에 해당하는 값이면 실행한다.
+                        loBool = false;
+                        JSONObject jsonObject = (JSONObject)jsonArray.get(jsonArray.length()-1);
+                        jsonObject.put("lo_crd",xpp.getText());
+                    }
+                    else if(laBool){
+                        laBool = false;
+                        JSONObject jsonObject = (JSONObject)jsonArray.get(jsonArray.length()-1);
+                        jsonObject.put("la_crd",xpp.getText());
+
+                    }
+                }
+                eventType = xpp.next();
+            }
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+                Log.d("service",""+jsonObject.keys()+" : "+jsonObject.get("spot_nm")+" "+jsonObject.get("lo_crd")+" "+jsonObject.get("la_crd"));
+
+
+                String lat = (String)jsonObject.get("la_crd");
+                String lng = (String)jsonObject.get("lo_crd");
+
+                if(minlat<=Double.parseDouble(lat) && maxlat>=Double.parseDouble(lat) && minlon<=Double.parseDouble(lng) && maxlon>=Double.parseDouble(lng)){
+                    Marker(type,Double.parseDouble(lat),Double.parseDouble(lng)); //마커 생성
+                }
             }
         }
         catch (Exception e){
@@ -449,7 +520,13 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                 marker.setIcon(MarkerIcons.BLACK);
 
                 // 마커 색 지정
-                if(type == 3)
+                if(type == 1){
+                    marker.setIconTintColor(Color.GREEN);
+                }
+                else if(type == 2){
+                    marker.setIconTintColor(Color.YELLOW);
+                }
+                else if(type == 3)
                 {
                     marker.setIconTintColor(Color.BLUE);
                 }
@@ -475,7 +552,6 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -483,6 +559,17 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_naver_map,
                 container, false);
+
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            latitude = bundle.getDouble("latitude");
+            longitude = bundle.getDouble("longitude");
+            minlat = bundle.getDouble("minlat");
+            maxlat = bundle.getDouble("maxlat");
+            minlon = bundle.getDouble("minlon");
+            maxlon = bundle.getDouble("maxlon");
+        }
+       // System.out.println("받는 : "+latitude+longitude+minlat+maxlat +minlon +maxlon);
 
         mapView = (MapView) rootView.findViewById(R.id.naverMap);
         mapView.onCreate(savedInstanceState);
@@ -516,16 +603,16 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void run() {
                 super.run();
-                        /*Log.d("service","*****지자체*****");
-                        makeUrl();
-                        Log.d("service","*****자전거*****");
-                        makeUrl2();*/
+                Log.d("service","*****지자체*****");
+                makeUrl();
+                Log.d("service","*****자전거*****");
+                makeUrl2();
                 Log.d("service","**********공사**********");
                 makeUrl3(+127.100000,+128.890000,+34.100000,+39.100000); // 샘플
                 //makeUrl3(minlon,maxlon,minlat,maxlat); // 현 위치 기반
                 Log.d("service","**********사고**********");
                 makeUrl4(+127.100000,+128.890000,+34.100000,+39.100000); // 샘플
-                //makeUrl4(minlon,maxlon,minlat,maxlat); // 현 위치 기반
+                //makeUrl4(minlon,maxlon,minlat,maxlat); // 현 위치 기반*/
             }
         }.start();
 

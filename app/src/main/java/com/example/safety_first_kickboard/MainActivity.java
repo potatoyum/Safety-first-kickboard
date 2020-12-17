@@ -18,6 +18,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraPosition;
@@ -33,7 +35,6 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
     private Button btn;
     private Button nextBtn;
-    //private NaverMap navermap = null; //버릴까
     public static NaverMap naverMap;
 
 //    private MapView mapView;
@@ -62,12 +63,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         gpsTracker = new GpsTracker(MainActivity.this);
 
+        /*//현위치 잡는거
         double latitude = gpsTracker.getLatitude(); // 위도
-        double longitude = gpsTracker.getLongitude(); //경도
+        double longitude = gpsTracker.getLongitude(); //경도*/
 
+        //일단 Test용으로 중앙파출소로 잡고 함 -> 찐 돌릴땐 현위치로 하면 댐ㅇㅇ
+        double latitude = 35.86985;
+        double longitude = 128.58890;
 
-        double diffLatitude = LatitudeInDifference(1000); //현위치 기준 반경 1000m
-        double diffLongitude = LongitudeInDifference(latitude, 1000);
+        double diffLatitude = LatitudeInDifference(5000); //현위치 기준 반경 5km
+        double diffLongitude = LongitudeInDifference(latitude, 5000);
 
         double minlon = longitude-diffLongitude;
         double maxlon = longitude+diffLongitude;
@@ -83,9 +88,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude + "\n주소:" + address, Toast.LENGTH_LONG).show();
 
-
         NaverMapFragment naverMapFragment = new NaverMapFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, naverMapFragment).commit();
+
+        //위도 경도 데이터를 NaverMapFragment로 주기위해 Bundle을 사용
+        Bundle bundle = new Bundle(6);
+        bundle.putDouble("latitude",latitude);
+        bundle.putDouble("longitude",longitude);//경도
+        bundle.putDouble("minlat",minlat);//최소위도
+        bundle.putDouble("maxlat",maxlat);//최대위도
+        bundle.putDouble("minlon",minlon);//최소경도
+        bundle.putDouble("maxlon",maxlon);//최대경도
+        naverMapFragment.setArguments(bundle);
+        //System.out.println("보내는 : "+latitude+longitude+minlat+maxlat +minlon +maxlon);
 
         //네이버 지도
        /* mapView = (MapView) findViewById(R.id.map_fragment);
