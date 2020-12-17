@@ -1,7 +1,5 @@
 package com.example.safety_first_kickboard;
 
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.naver.maps.geometry.LatLng;
@@ -512,6 +511,11 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
         Log.d("service",la+" "+lo);
         Log.d("service",String.valueOf(naverMap));
 
+        int a = ResourcesCompat.getColor(getResources(),R.color.marker1,null);
+        int b = ResourcesCompat.getColor(getResources(),R.color.marker2,null);
+        int c = ResourcesCompat.getColor(getResources(),R.color.marker3,null);
+        int d = ResourcesCompat.getColor(getResources(),R.color.marker4,null);
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -521,18 +525,18 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
                 // 마커 색 지정
                 if(type == 1){
-                    marker.setIconTintColor(Color.GREEN);
+                    marker.setIconTintColor(a);
                 }
                 else if(type == 2){
-                    marker.setIconTintColor(Color.YELLOW);
+                    marker.setIconTintColor(b);
                 }
                 else if(type == 3)
                 {
-                    marker.setIconTintColor(Color.BLUE);
+                    marker.setIconTintColor(c);
                 }
                 else if(type == 4)
                 {
-                    marker.setIconTintColor(Color.RED);
+                    marker.setIconTintColor(d);
                 }
             }
         });
