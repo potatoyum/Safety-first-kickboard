@@ -1,5 +1,6 @@
 package com.example.safety_first_kickboard;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
 import com.naver.maps.map.overlay.Marker;
 import com.naver.maps.map.util.FusedLocationSource;
+import com.naver.maps.map.util.MarkerIcons;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -304,6 +306,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void work_parseData(URL url){ //받아와서 데이터 파싱하기
+        int type = 3;
         JSONArray jsonArray = new JSONArray();
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -353,10 +356,10 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                 JSONObject jsonObject = (JSONObject) jsonArray.get(i);
                 Log.d("service",""+jsonObject.keys()+" : "+jsonObject.get("EventStatusMsg")+" "+jsonObject.get("CoordX")+" "+jsonObject.get("CoordY"));
 
-                String lat = (String)jsonObject.get("CoordX");
-                String lng = (String)jsonObject.get("CoordY");
+                String lng = (String)jsonObject.get("CoordX");
+                String lat = (String)jsonObject.get("CoordY");
 
-                Marker(Double.parseDouble(lat),Double.parseDouble(lng)); //마커 생성
+                Marker(type,Double.parseDouble(lat),Double.parseDouble(lng)); //마커 생성
             }
         }
         catch (Exception e){
@@ -366,6 +369,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void Incident_parseData(URL url){ //받아와서 데이터 파싱하기
+        int type = 4;
         JSONArray jsonArray = new JSONArray();
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -415,12 +419,12 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                 JSONObject jsonObject = (JSONObject) jsonArray.get(i);
                 Log.d("service",""+jsonObject.keys()+" : "+jsonObject.get("IncidentMsg")+" "+jsonObject.get("CoordX")+" "+jsonObject.get("CoordY"));
 
-                String lat = (String)jsonObject.get("CoordX");
-                String lng = (String)jsonObject.get("CoordY");
+                String lng = (String)jsonObject.get("CoordX");
+                String lat = (String)jsonObject.get("CoordY");
 
                 //Log.d("service",lat+" "+lng);
 
-                Marker(Double.parseDouble(lat),Double.parseDouble(lng)); //마커 생성
+                Marker(type,Double.parseDouble(lat),Double.parseDouble(lng)); //마커 생성
             }
         }
         catch (Exception e){
@@ -430,9 +434,9 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     //마커생성 함수
-    public void Marker(double la,double lo) {
+    public void Marker(int type,double la,double lo) {
         Marker marker = new Marker();
-        marker.setPosition(new LatLng(lo, la));
+        marker.setPosition(new LatLng(la, lo));
 
         Log.d("service",la+" "+lo);
         Log.d("service",String.valueOf(naverMap));
@@ -442,6 +446,17 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             public void run() {
                 marker.setMap(naverMap);
                 Log.d("service",String.valueOf(naverMap));
+                marker.setIcon(MarkerIcons.BLACK);
+
+                // 마커 색 지정
+                if(type == 3)
+                {
+                    marker.setIconTintColor(Color.BLUE);
+                }
+                else if(type == 4)
+                {
+                    marker.setIconTintColor(Color.RED);
+                }
             }
         });
     }
