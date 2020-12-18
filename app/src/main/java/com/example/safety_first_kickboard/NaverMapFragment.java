@@ -17,6 +17,7 @@ import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
 import com.naver.maps.map.overlay.InfoWindow;
 import com.naver.maps.map.overlay.Marker;
+import com.naver.maps.map.overlay.Overlay;
 import com.naver.maps.map.util.FusedLocationSource;
 import com.naver.maps.map.util.MarkerIcons;
 
@@ -41,8 +42,6 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     FusedLocationSource locationSource;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     Double latitude, longitude, minlat, maxlat, minlon, maxlon;
-    public int count = 0;
-    public int[] click = new int[100];
 
     //그냥 공공데이터 받아와서 출력 볼려고 만든 함수 이며 실제적으로 필요한 데이터 짤라서 저장하는건 parseData에서 실행
     // 1.지자체별 사고 다발 지역 정보
@@ -545,7 +544,6 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
         marker.setPosition(new LatLng(la, lo));
         InfoWindow infoWindow = new InfoWindow();
 
-        Log.d("service",""+count);
         Log.d("service",la+" "+lo);
         Log.d("service",String.valueOf(naverMap));
 
@@ -586,23 +584,25 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     marker.setIconTintColor(d);
                 }
 
-                //마커 클릭시 정보창 생성
-                marker.setOnClickListener(overlay->{
-                    if(click[count] % 2 == 1) {
-                        infoWindow.open(marker);
-                    }
-                    else
-                    {
-                        infoWindow.close();
-                    }
-                    click[count]++;
-                    return true;
-                });
-
             }
         });
 
-        count++;
+        Overlay.OnClickListener listener = overlay -> {
+            Marker markers = (Marker)overlay;
+
+            if (markers.getInfoWindow() == null) {
+                // 현재 마커에 정보 창이 열려있지 않을 경우 엶
+                infoWindow.open(markers);
+            } else {
+                // 이미 현재 마커에 정보 창이 열려있을 경우 닫음
+                infoWindow.close();
+            }
+
+            return true;
+        };
+
+        marker.setOnClickListener(listener);
+
     }
 
     public NaverMapFragment() {
@@ -636,7 +636,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             minlon = bundle.getDouble("minlon");
             maxlon = bundle.getDouble("maxlon");
         }
-       // System.out.println("받는 : "+latitude+longitude+minlat+maxlat +minlon +maxlon);
+        // System.out.println("받는 : "+latitude+longitude+minlat+maxlat +minlon +maxlon);
 
         mapView = (MapView) rootView.findViewById(R.id.naverMap);
         mapView.onCreate(savedInstanceState);
