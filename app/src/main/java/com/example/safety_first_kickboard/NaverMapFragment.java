@@ -15,6 +15,7 @@ import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.MapView;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
+import com.naver.maps.map.overlay.InfoWindow;
 import com.naver.maps.map.overlay.Marker;
 import com.naver.maps.map.util.FusedLocationSource;
 import com.naver.maps.map.util.MarkerIcons;
@@ -40,6 +41,8 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     FusedLocationSource locationSource;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     Double latitude, longitude, minlat, maxlat, minlon, maxlon;
+    public int count = 0;
+    public int[] click = new int[100];
 
     //그냥 공공데이터 받아와서 출력 볼려고 만든 함수 이며 실제적으로 필요한 데이터 짤라서 저장하는건 parseData에서 실행
     // 1.지자체별 사고 다발 지역 정보
@@ -295,9 +298,10 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
                 String lat = (String)jsonObject.get("la_crd");
                 String lng = (String)jsonObject.get("lo_crd");
+                String name = (String)jsonObject.get("spot_nm");
 
                 if(minlat<=Double.parseDouble(lat) && maxlat>=Double.parseDouble(lat) && minlon<=Double.parseDouble(lng) && maxlon>=Double.parseDouble(lng)){
-                    Marker(type,Double.parseDouble(lat),Double.parseDouble(lng)); //마커 생성
+                    Marker(type,Double.parseDouble(lat),Double.parseDouble(lng),name); //마커 생성
                 }
             }
         }
@@ -362,9 +366,10 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
                 String lat = (String)jsonObject.get("la_crd");
                 String lng = (String)jsonObject.get("lo_crd");
+                String name = (String)jsonObject.get("spot_nm");
 
                 if(minlat<=Double.parseDouble(lat) && maxlat>=Double.parseDouble(lat) && minlon<=Double.parseDouble(lng) && maxlon>=Double.parseDouble(lng)){
-                    Marker(type,Double.parseDouble(lat),Double.parseDouble(lng)); //마커 생성
+                    Marker(type,Double.parseDouble(lat),Double.parseDouble(lng),name); //마커 생성
                 }
             }
         }
@@ -378,6 +383,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     private void work_parseData(URL url){ //받아와서 데이터 파싱하기
         int type = 3;
         JSONArray jsonArray = new JSONArray();
+
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             XmlPullParser xpp = factory.newPullParser();
@@ -388,12 +394,16 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             boolean EventBool = false;// 장소이름
             boolean XBool = false;// 경도
             boolean YBool = false;//위도
+            boolean BlockBool = false; // 차로차단 방법
 
             while (eventType != XmlPullParser.END_DOCUMENT) { // START_TAG는 태그의 시작부분, TEXT는 태그안에 있는  데이터
                 //JSONObject jsonObject = new JSONObject();
                 if (eventType == XmlPullParser.START_TAG) {
                     if (xpp.getName().equals("eventstatusmsg")) { // 태그가 spot_nm으로 시작하면 spotBool값 true로 바꾸기
                         EventBool = true;
+                    }
+                    else if (xpp.getName().equals("lanesblocktype")) { // 태그가 lo_crd으로 시작하면 spotBool값 true로 바꾸기
+                        BlockBool = true;
                     }
                     else if (xpp.getName().equals("coordx")) { // 태그가 lo_crd으로 시작하면 spotBool값 true로 바꾸기
                         XBool = true;
@@ -419,6 +429,11 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                         jsonObject.put("EventStatusMsg", xpp.getText());
 
                     }
+                    else if (BlockBool) {
+                        BlockBool = false;
+                        JSONObject jsonObject = (JSONObject)jsonArray.get(jsonArray.length()-1);
+                        jsonObject.put("lanesblocktype",xpp.getText());
+                    }
                 }
                 eventType = xpp.next();
             }
@@ -428,8 +443,16 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
                 String lng = (String)jsonObject.get("CoordX");
                 String lat = (String)jsonObject.get("CoordY");
+                String name = (String)jsonObject.get("EventStatusMsg");
+                int block = Integer.valueOf((String)jsonObject.get("lanesblocktype"));
 
-                Marker(type,Double.parseDouble(lat),Double.parseDouble(lng)); //마커 생성
+                Log.e("service",""+block);
+
+                //차로통제가 있는 경우에만
+                if(block >= 1) {
+                    Marker(type, Double.parseDouble(lat), Double.parseDouble(lng), name); //마커 생성
+                }
+
             }
         }
         catch (Exception e){
@@ -451,6 +474,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             boolean EventBool = false;// 장소이름
             boolean XBool = false;// 경도
             boolean YBool = false;//위도
+            boolean BlockBool = false; // 차로차단 방법
 
             while (eventType != XmlPullParser.END_DOCUMENT) { // START_TAG는 태그의 시작부분, TEXT는 태그안에 있는  데이터
                 //JSONObject jsonObject = new JSONObject();
@@ -458,18 +482,27 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     if (xpp.getName().equals("incidentmsg")) {
                         EventBool = true;
                     }
+                    else if (xpp.getName().equals("lanesblocktype")) {
+                        BlockBool = true;
+                    }
                     else if (xpp.getName().equals("coordy")) {
                         YBool = true;
                     }
                     else if (xpp.getName().equals("coordx")) {
                         XBool = true;
                     }
+
                 } else if (eventType == XmlPullParser.TEXT) { //
                     if(EventBool){ // 태그에 해당하는 값이면 실행한다.
                         EventBool = false;
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("IncidentMsg",xpp.getText());
                         jsonArray.put(jsonObject);
+                    }
+                    else if (BlockBool) {
+                        BlockBool = false;
+                        JSONObject jsonObject = (JSONObject)jsonArray.get(jsonArray.length()-1);
+                        jsonObject.put("lanesblocktype",xpp.getText());
                     }
                     else if (YBool) {
                         YBool = false;
@@ -491,10 +524,13 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
                 String lng = (String)jsonObject.get("CoordX");
                 String lat = (String)jsonObject.get("CoordY");
+                String name = (String)jsonObject.get("IncidentMsg");
+                int block = Integer.valueOf((String)jsonObject.get("lanesblocktype"));
 
-                //Log.d("service",lat+" "+lng);
-
-                Marker(type,Double.parseDouble(lat),Double.parseDouble(lng)); //마커 생성
+                //차로통제가 있는 경우에만
+                if(block >= 1) {
+                    Marker(type, Double.parseDouble(lat), Double.parseDouble(lng), name); //마커 생성
+                }
             }
         }
         catch (Exception e){
@@ -504,10 +540,12 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     //마커생성 함수
-    public void Marker(int type,double la,double lo) {
+    public void Marker(int type,double la,double lo,String name) {
         Marker marker = new Marker();
         marker.setPosition(new LatLng(la, lo));
+        InfoWindow infoWindow = new InfoWindow();
 
+        Log.d("service",""+count);
         Log.d("service",la+" "+lo);
         Log.d("service",String.valueOf(naverMap));
 
@@ -515,6 +553,15 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
         int b = ResourcesCompat.getColor(getResources(),R.color.marker2,null);
         int c = ResourcesCompat.getColor(getResources(),R.color.marker3,null);
         int d = ResourcesCompat.getColor(getResources(),R.color.marker4,null);
+
+        //정보창
+        infoWindow.setAdapter(new InfoWindow.DefaultTextAdapter(getActivity()) {
+            @NonNull
+            @Override
+            public CharSequence getText(@NonNull InfoWindow infoWindow) {
+                return name;
+            }
+        });
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -538,8 +585,24 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                 {
                     marker.setIconTintColor(d);
                 }
+
+                //마커 클릭시 정보창 생성
+                marker.setOnClickListener(overlay->{
+                    if(click[count] % 2 == 1) {
+                        infoWindow.open(marker);
+                    }
+                    else
+                    {
+                        infoWindow.close();
+                    }
+                    click[count]++;
+                    return true;
+                });
+
             }
         });
+
+        count++;
     }
 
     public NaverMapFragment() {
