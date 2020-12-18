@@ -317,12 +317,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(@NonNull NaverMap naverMap){
-      /*
-        navermap = naverMap;
-
-        Log.d("service","네이ㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣ버매애앵애애애애애애애애애ㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐ앱");
-        Log.d("service",String.valueOf(navermap));
-        */
 
 //        double latitude = gpsTracker.getLatitude(); // 위도
 //        double longitude = gpsTracker.getLongitude(); //경도
