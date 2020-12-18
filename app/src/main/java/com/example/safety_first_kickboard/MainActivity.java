@@ -9,7 +9,6 @@ import android.location.Geocoder;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -18,8 +17,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraPosition;
@@ -49,9 +46,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        btn = (Button)findViewById(R.id.btn);
-        nextBtn = (Button)findViewById(R.id.nextBtn);
 
         if (!checkLocationServicesStatus()) {
 
@@ -115,37 +109,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         */
 
-
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new Thread(){
-                    @Override
-                    public void run() {
-                       super.run();
-                        /*Log.d("service","*****지자체*****");
-                        makeUrl();
-                        Log.d("service","*****자전거*****");
-                        makeUrl2();*/
-                        Log.d("service","*****공사*****");
-                        //makeUrl3(+127.100000,+128.890000,+34.100000,+39.100000); // 샘플
-                        //makeUrl3(minlon,maxlon,minlat,maxlat); // 현 위치 기반
-                        Log.d("service","*****사고*****");
-                        //makeUrl4(+127.100000,+128.890000,+34.100000,+39.100000); // 샘플
-                        //makeUrl4(minlon,maxlon,minlat,maxlat); // 현 위치 기반
-                    }
-                }.start();
-            }
-
-        });
-        nextBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Intent intent = new Intent(getApplicationContext(),MainActivity2.class);
-               // startActivity(intent);
-
-            }
-        });
 
     }
 

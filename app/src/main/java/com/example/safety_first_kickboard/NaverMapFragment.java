@@ -595,14 +595,8 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
         naverMap.setLocationTrackingMode(Face); //face모드로 위치 트래킹
         naverMap.addOnLocationChangeListener(location -> Toast.makeText(getActivity(), location.getLatitude() +", " +location.getLongitude(), Toast.LENGTH_SHORT).show()); //위치이동되면 토스트 뜸
 
-        /*
-        Marker marker = new Marker();
-        marker.setPosition(new LatLng(37.5670135, 126.9783740)); //서울역마크
-        marker.setMap(naverMap);
-        */
 
         //액티비티에서 읽은 값 여기서 마커찍기
-
         new Thread(){
             @Override
             public void run() {
