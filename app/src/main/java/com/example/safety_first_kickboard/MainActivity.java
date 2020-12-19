@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //    private static NaverMap naverMap;
     private GpsTracker gpsTracker;
     List SelectedItems  = new ArrayList();
-    NaverMapFragment naverMapFragment = new NaverMapFragment();
+    NaverMapFragment naverMapFragment;
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude + "\n주소:" + address, Toast.LENGTH_LONG).show();
 
+        naverMapFragment = new NaverMapFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, naverMapFragment).commit();
 
         //위도 경도 데이터를 NaverMapFragment로 주기위해 Bundle을 사용
@@ -111,9 +113,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         bundle.putDouble("maxlat",maxlat);//최대위도
         bundle.putDouble("minlon",minlon);//최소경도
         bundle.putDouble("maxlon",maxlon);//최대경도
-        naverMapFragment.setArguments(bundle);
+//        naverMapFragment.setArguments(bundle);
 
-            Button button = (Button)findViewById(R.id.button);
+            ImageButton button = (ImageButton) findViewById(R.id.check_button);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -174,6 +176,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                 });
+
+
         builder.setNegativeButton("Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
