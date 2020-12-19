@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -64,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             checkRunTimePermission();
         }
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
 
         gpsTracker = new GpsTracker(MainActivity.this);
 

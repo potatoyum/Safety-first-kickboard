@@ -27,6 +27,7 @@ import com.naver.maps.map.OnMapReadyCallback;
 import com.naver.maps.map.overlay.InfoWindow;
 import com.naver.maps.map.overlay.Marker;
 import com.naver.maps.map.overlay.Overlay;
+import com.naver.maps.map.overlay.OverlayImage;
 import com.naver.maps.map.util.FusedLocationSource;
 import com.naver.maps.map.util.MarkerIcons;
 
@@ -583,17 +584,30 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                 // 마커 색 지정
                 if(type == 1){
                     marker.setIconTintColor(a);
+                    marker.setIcon(OverlayImage.fromResource(R.drawable.marker1));
+                    marker.setWidth(150);
+                    marker.setHeight(150);
+
                 }
                 else if(type == 2){
                     marker.setIconTintColor(b);
+                    marker.setIcon(OverlayImage.fromResource(R.drawable.marker2));
+                    marker.setWidth(150);
+                    marker.setHeight(150);
                 }
                 else if(type == 3)
                 {
                     marker.setIconTintColor(c);
+                    marker.setIcon(OverlayImage.fromResource(R.drawable.marker3));
+                    marker.setWidth(150);
+                    marker.setHeight(150);
                 }
                 else if(type == 4)
                 {
                     marker.setIconTintColor(d);
+                    marker.setIcon(OverlayImage.fromResource(R.drawable.marker4));
+                    marker.setWidth(150);
+                    marker.setHeight(150);
                 }
 
             }
