@@ -4,12 +4,21 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Button btn;
     private Button nextBtn;
     public static NaverMap naverMap;
+
 
 //    private MapView mapView;
 //    private static NaverMap naverMap;
@@ -108,9 +118,43 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             fm.beginTransaction().add(R.id.map, mapFragment).commit();
         }
         */
+        Button btn = (Button) findViewById(R.id.button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popup= new PopupMenu(getApplicationContext(), v);//v는 클릭된 뷰를 의미
 
-
+                getMenuInflater().inflate(R.menu.menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        new Thread(){
+                            @Override
+                            public void run() {
+                                super.run();
+                                switch(item.getItemId()) {
+                                    case R.id.menu1:
+                                        naverMapFragment.makeUrl();
+                                        break;
+                                    case R.id.menu2:
+                                        naverMapFragment.makeUrl2();
+                                        break;
+                                    case R.id.menu3:
+                                        naverMapFragment.makeUrl3(+127.100000,+128.890000,+34.100000,+39.100000); // 샘플
+                                        break;
+                                    case R.id.menu4:
+                                        naverMapFragment.makeUrl4(+127.100000,+128.890000,+34.100000,+39.100000); // 샘플
+                                        break;
+                                }
+                            }
+                        }.start();
+                        return false;
+                    }
+                });popup.show();//Popup Menu 보이기
+            }
+        });
     }
+
 
     //반경 m이내의 위도차(degree)
     public double LatitudeInDifference(int diff){

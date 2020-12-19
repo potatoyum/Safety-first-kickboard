@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".IntroActivity">
+
+        <item
+            android:id="@+id/menu1"
+            android:title="지자체 사고다발 구간" />
+        <item android:id="@+id/menu2"
+            android:title="자전거 사고다발 구간" />
+        <item android:id="@+id/menu3"
+            android:title="공사구간" />
+        <item android:id="@+id/menu4"
+            android:title="사고구간" />
+</menu>

@@ -3,13 +3,22 @@ package com.example.safety_first_kickboard;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.MapView;
@@ -42,10 +51,11 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     FusedLocationSource locationSource;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     Double latitude, longitude, minlat, maxlat, minlon, maxlon;
+    Integer m;
 
     //그냥 공공데이터 받아와서 출력 볼려고 만든 함수 이며 실제적으로 필요한 데이터 짤라서 저장하는건 parseData에서 실행
     // 1.지자체별 사고 다발 지역 정보
-    private void makeUrl(){
+    public void makeUrl(){
         URL url;
         StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/B552061/frequentzoneLg/getRestFrequentzoneLg");
         try{ // URI만들기(GET형식 요청보내기)
@@ -94,7 +104,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     // 2.자전거 사고 다발 지역 정보
-    private void makeUrl2(){
+    public void makeUrl2(){
         URL url;
         StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/B552061/frequentzoneBicycle/getRestFrequentzoneBicycle");
         try{ // URI만들기(GET형식 요청보내기)
@@ -143,7 +153,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     // 3.공사정보
-    private void makeUrl3(double minX,double maxX,double minY,double maxY){
+    public void makeUrl3(double minX,double maxX,double minY,double maxY){
         URL url;
         StringBuilder urlBuilder = new StringBuilder("http://openapi.its.go.kr:8082/api/NEventIdentity");
 
@@ -194,7 +204,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     // 4.사고정보
-    private void makeUrl4(double minX,double maxX,double minY,double maxY){
+    public void makeUrl4(double minX,double maxX,double minY,double maxY){
         URL url;
         StringBuilder urlBuilder = new StringBuilder("http://openapi.its.go.kr:8082/api/NIncidentIdentity");
         try{ // URI만들기(GET형식 요청보내기)
@@ -243,7 +253,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
-    private void loc_parseData(URL url){ //받아와서 데이터 파싱하기
+    public void loc_parseData(URL url){ //받아와서 데이터 파싱하기
         int type = 1;
         JSONArray jsonArray = new JSONArray();
         try {
@@ -301,6 +311,8 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
                 if(minlat<=Double.parseDouble(lat) && maxlat>=Double.parseDouble(lat) && minlon<=Double.parseDouble(lng) && maxlon>=Double.parseDouble(lng)){
                     Marker(type,Double.parseDouble(lat),Double.parseDouble(lng),name); //마커 생성
+                   /* FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.detach(this).attach(this).commit();*/
                 }
             }
         }
@@ -311,7 +323,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
-    private void bike_parseData(URL url){ //받아와서 데이터 파싱하기
+    public void bike_parseData(URL url){ //받아와서 데이터 파싱하기
         int type = 2;
         JSONArray jsonArray = new JSONArray();
         try {
@@ -379,7 +391,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
-    private void work_parseData(URL url){ //받아와서 데이터 파싱하기
+    public void work_parseData(URL url){ //받아와서 데이터 파싱하기
         int type = 3;
         JSONArray jsonArray = new JSONArray();
 
@@ -460,7 +472,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void Incident_parseData(URL url){ //받아와서 데이터 파싱하기
+    public void Incident_parseData(URL url){ //받아와서 데이터 파싱하기
         int type = 4;
         JSONArray jsonArray = new JSONArray();
         try {
@@ -612,7 +624,6 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
     public static NaverMapFragment newInstance(String param1, String param2) {
         NaverMapFragment fragment = new NaverMapFragment();
-
         return fragment;
     }
 
@@ -646,7 +657,6 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
         return rootView;
     }
-
     @Override
     public void onMapReady(@NonNull NaverMap naverMap){ //여기서 지도 관련 하면됨~~~~~~~~~~~!
         naverMap = naverMap;
@@ -660,7 +670,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
 
         //액티비티에서 읽은 값 여기서 마커찍기
-        new Thread(){
+        /*new Thread(){
             @Override
             public void run() {
                 super.run();
@@ -673,9 +683,9 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                 //makeUrl3(minlon,maxlon,minlat,maxlat); // 현 위치 기반
                 Log.d("service","**********사고**********");
                 makeUrl4(+127.100000,+128.890000,+34.100000,+39.100000); // 샘플
-                //makeUrl4(minlon,maxlon,minlat,maxlat); // 현 위치 기반*/
+                //makeUrl4(minlon,maxlon,minlat,maxlat); // 현 위치 기반
             }
-        }.start();
+        }.start();*/
 
     }
 
