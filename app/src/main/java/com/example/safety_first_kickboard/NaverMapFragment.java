@@ -53,6 +53,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     Double latitude, longitude, minlat, maxlat, minlon, maxlon;
     Integer m;
+    Marker marker = new Marker();
 
     //그냥 공공데이터 받아와서 출력 볼려고 만든 함수 이며 실제적으로 필요한 데이터 짤라서 저장하는건 parseData에서 실행
     // 1.지자체별 사고 다발 지역 정보
@@ -553,7 +554,6 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
     //마커생성 함수
     public void Marker(int type,double la,double lo,String name) {
-        Marker marker = new Marker();
         marker.setPosition(new LatLng(la, lo));
         InfoWindow infoWindow = new InfoWindow();
 

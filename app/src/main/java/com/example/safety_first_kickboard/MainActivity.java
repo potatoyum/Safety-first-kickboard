@@ -1,6 +1,7 @@
 package com.example.safety_first_kickboard;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -32,8 +34,10 @@ import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraPosition;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
+import com.naver.maps.map.overlay.Marker;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,11 +47,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Button btn;
     private Button nextBtn;
     public static NaverMap naverMap;
-
-
+    final int DIALOG_MULTICHOICE = 4; // 다이얼로그용 ID
 //    private MapView mapView;
 //    private static NaverMap naverMap;
     private GpsTracker gpsTracker;
+    List SelectedItems  = new ArrayList();
+    NaverMapFragment naverMapFragment = new NaverMapFragment();
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -96,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude + "\n주소:" + address, Toast.LENGTH_LONG).show();
 
-        NaverMapFragment naverMapFragment = new NaverMapFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, naverMapFragment).commit();
 
         //위도 경도 데이터를 NaverMapFragment로 주기위해 Bundle을 사용
@@ -108,57 +112,76 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         bundle.putDouble("minlon",minlon);//최소경도
         bundle.putDouble("maxlon",maxlon);//최대경도
         naverMapFragment.setArguments(bundle);
-        //System.out.println("보내는 : "+latitude+longitude+minlat+maxlat +minlon +maxlon);
 
-        //네이버 지도
-       /* mapView = (MapView) findViewById(R.id.map_fragment);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(this);
-
-        FragmentManager fm = getSupportFragmentManager();
-        MapFragment mapFragment = (MapFragment)fm.findFragmentById(R.id.map_fragment);
-        if (mapFragment == null) {
-            mapFragment = MapFragment.newInstance();
-            fm.beginTransaction().add(R.id.map, mapFragment).commit();
-        }
-        */
-        Button btn = (Button) findViewById(R.id.button);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popup= new PopupMenu(getApplicationContext(), v);//v는 클릭된 뷰를 의미
-
-                getMenuInflater().inflate(R.menu.menu, popup.getMenu());
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        new Thread(){
-                            @Override
-                            public void run() {
-                                super.run();
-                                switch(item.getItemId()) {
-                                    case R.id.menu1:
-                                        naverMapFragment.makeUrl();
-                                        break;
-                                    case R.id.menu2:
-                                        naverMapFragment.makeUrl2();
-                                        break;
-                                    case R.id.menu3:
-                                        naverMapFragment.makeUrl3(+127.100000,+128.890000,+34.100000,+39.100000); // 샘플
-                                        break;
-                                    case R.id.menu4:
-                                        naverMapFragment.makeUrl4(+127.100000,+128.890000,+34.100000,+39.100000); // 샘플
-                                        break;
-                                }
-                            }
-                        }.start();
-                        return false;
-                    }
-                });popup.show();//Popup Menu 보이기
-            }
-        });
+            Button button = (Button)findViewById(R.id.button);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    show();
+                }
+            });
     }
 
+    void show()
+    {
+        final List<String> ListItems = new ArrayList<>();
+        ListItems.add("지자체 사고다발 구간");
+        ListItems.add("자전거 사고다발 구간");
+        ListItems.add("공사 구간");
+        ListItems.add("사고 구간");
+        final CharSequence[] items =  ListItems.toArray(new String[ ListItems.size()]);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMultiChoiceItems(items, null,
+                new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which,
+                                        boolean isChecked) {
+                        if (isChecked) {
+                            //사용자가 체크한 경우 리스트에 추가
+                            SelectedItems.add(which);
+                        } else if (SelectedItems.contains(which)) {
+                            //이미 리스트에 들어있던 아이템이면 제거
+                            SelectedItems.remove(Integer.valueOf(which));
+                        }
+                    }
+                });
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        int i;
+                        String msg="";
+                        for (Object temp : SelectedItems) {
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    super.run();
+                                    switch ((int)temp) {
+                                        case 0:
+                                            naverMapFragment.makeUrl();
+                                            break;
+                                        case 1:
+                                            naverMapFragment.makeUrl2();
+                                            break;
+                                        case 2:
+                                            naverMapFragment.makeUrl3(+127.100000,+128.890000,+34.100000,+39.100000);
+                                            break;
+                                        case 3:
+                                            naverMapFragment.makeUrl4(+127.100000,+128.890000,+34.100000,+39.100000);
+                                            break;
+                                    }
+                                }
+                            }.start();
+                        }
+                    }
+                });
+        builder.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+        builder.show();
+    }
 
     //반경 m이내의 위도차(degree)
     public double LatitudeInDifference(int diff){
