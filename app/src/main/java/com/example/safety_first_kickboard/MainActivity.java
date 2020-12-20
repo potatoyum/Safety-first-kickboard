@@ -21,8 +21,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.naver.maps.geometry.LatLng;
-import com.naver.maps.map.CameraPosition;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
 
@@ -193,7 +191,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(DialogInterface dialog, int id)
             {
                 view.setVisibility(View.GONE);
-                //Toast.makeText(getApplicationContext(), "OK Click", Toast.LENGTH_SHORT).show();
             }
         });
 
