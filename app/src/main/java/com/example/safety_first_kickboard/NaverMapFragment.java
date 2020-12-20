@@ -1,5 +1,6 @@
 package com.example.safety_first_kickboard;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -22,6 +23,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.naver.maps.geometry.LatLng;
+import com.naver.maps.map.CameraUpdate;
+import com.naver.maps.map.LocationSource;
 import com.naver.maps.map.MapView;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
@@ -47,14 +50,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.naver.maps.map.LocationTrackingMode.Face;
+import static com.naver.maps.map.LocationTrackingMode.Follow;
+import static com.naver.maps.map.LocationTrackingMode.NoFollow;
 
 
 public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     private MapView mapView;
     NaverMap naverMap;
     FusedLocationSource locationSource;
+    NaverMap.OnLocationChangeListener onLocationChangeListener;
+
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     Double latitude, longitude, minlat, maxlat, minlon, maxlon;
+
+
     static List<Marker> markers1 = new ArrayList<Marker>(), markers2= new ArrayList<Marker>(), markers3= new ArrayList<Marker>(), markers4= new ArrayList<Marker>();
     //그냥 공공데이터 받아와서 출력 볼려고 만든 함수 이며 실제적으로 필요한 데이터 짤라서 저장하는건 parseData에서 실행
     // 1.지자체별 사고 다발 지역 정보
@@ -723,7 +732,24 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
         naverMap.setLocationSource(locationSource);
         naverMap.getUiSettings().setLocationButtonEnabled(true); //현위치 버튼 활성화
         naverMap.setLocationTrackingMode(Face); //face모드로 위치 트래킹
-        naverMap.addOnLocationChangeListener(location -> Toast.makeText(getActivity(), location.getLatitude() +", " +location.getLongitude(), Toast.LENGTH_SHORT).show()); //위치이동되면 토스트 뜸
+
+
+
+        onLocationChangeListener = new NaverMap.OnLocationChangeListener() {
+            @Override
+            public void onLocationChange(@NonNull Location location) {
+                Toast.makeText(getActivity(), location.getLatitude() +", " +location.getLongitude(), Toast.LENGTH_SHORT).show();
+                CameraUpdate cameraUpdate = CameraUpdate.scrollTo(new LatLng(location.getLatitude(),location.getLongitude()));
+                //cameraUpdate.zoomTo(20);
+                getNaverMap().moveCamera(cameraUpdate);
+
+            }
+        };
+
+        naverMap.addOnLocationChangeListener(onLocationChangeListener);
+
+        //naverMap.moveCamera(cameraUpdate.
+ //위치이동되면 토스트 뜸
 
 
         //액티비티에서 읽은 값 여기서 마커찍기
