@@ -325,6 +325,10 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     Marker(type,Double.parseDouble(lat),Double.parseDouble(lng),name); //마커 생성
                 }
             }
+            Marker(1, 35.866298, 128.593480, "대구광역시 중구 덕산동(미사랑치과 인근)");
+            Marker(1, 35.865935, 128.593628, "대구광역시 중구 성내1동 (덕산한의원 인근)");
+            Marker(1, 35.8684606646585, 128.59342418350042, "대구광역시 중구 동성로3가(GS25 중앙제일점 인근)");
+
         }
         catch (Exception e){
             Log.d("service","Data parser error.");
@@ -393,6 +397,9 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     Marker(type,Double.parseDouble(lat),Double.parseDouble(lng),name); //마커 생성
                 }
             }
+            Marker(2, 35.868315, 128.593694, "대구광역시 중구 남일동(문화예술전용극장 인근)");
+            Marker(2, 35.86730198940656, 128.5929105571648, "대구광역시 중구 남성로 (쟁이벨리댄스 인근)");
+            Marker(2, 35.866954, 128.592562, "대구광역시 중구 성내2동(세창한의원 인근)");
         }
         catch (Exception e){
             Log.d("service","Data parser error.");
@@ -475,6 +482,10 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                 }
 
             }
+            Marker(3,35.863583, 128.595057, "도로포장공사");
+            Marker(3,35.865244, 128.594285, "도로확장공사");
+            Marker(3,35.866818, 128.594403, "도로보수공사");
+
         }
         catch (Exception e){
             Log.d("service","Data parser error.");
@@ -553,12 +564,16 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     Marker(type, Double.parseDouble(lat), Double.parseDouble(lng), name); //마커 생성
                 }
             }
+            Marker(4, 35.865610, 128.592504, "승용차 2중 추돌사고");
+            Marker(4, 35.864827, 128.593362, "화물차 2중 추돌사고");
+            Marker(4, 35.865462, 128.593770, "승용차 3중 추돌사고");
         }
         catch (Exception e){
             Log.d("service","Data parser error.");
             Log.e("service",e.toString());
         }
     }
+
 
     //마커생성 함수
     public void Marker(int type,double la,double lo,String name) {
