@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GpsTracker gpsTracker;
     List SelectedItems  = new ArrayList();
     NaverMapFragment naverMapFragment;
+    static ArrayList<Integer> m = new ArrayList<Integer>();//타입설정 int타입만 사용가능
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -105,16 +106,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         naverMapFragment = new NaverMapFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, naverMapFragment).commit();
 
-        //위도 경도 데이터를 NaverMapFragment로 주기위해 Bundle을 사용
-        Bundle bundle = new Bundle(6);
-        bundle.putDouble("latitude",latitude);
-        bundle.putDouble("longitude",longitude);//경도
-        bundle.putDouble("minlat",minlat);//최소위도
-        bundle.putDouble("maxlat",maxlat);//최대위도
-        bundle.putDouble("minlon",minlon);//최소경도
-        bundle.putDouble("maxlon",maxlon);//최대경도
-//        naverMapFragment.setArguments(bundle);
-
             ImageButton button = (ImageButton) findViewById(R.id.check_button);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -122,6 +113,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     show();
                 }
             });
+
+        //위도 경도 데이터를 NaverMapFragment로 주기위해 Bundle을 사용
+        Bundle bundle = new Bundle();
+        bundle.putDouble("latitude",latitude);
+        bundle.putDouble("longitude",longitude);//경도
+        bundle.putDouble("minlat",minlat);//최소위도
+        bundle.putDouble("maxlat",maxlat);//최대위도
+        bundle.putDouble("minlon",minlon);//최소경도
+        bundle.putDouble("maxlon",maxlon);//최대경도
+        naverMapFragment.setArguments(bundle);
+
     }
 
     void show()
@@ -134,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         final CharSequence[] items =  ListItems.toArray(new String[ ListItems.size()]);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("제외할 것을 선택하세요");
         builder.setMultiChoiceItems(items, null,
                 new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
@@ -153,26 +156,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         int i;
                         String msg="";
                         for (Object temp : SelectedItems) {
-                            new Thread() {
+
+                           runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    super.run();
                                     switch ((int)temp) {
                                         case 0:
-                                            naverMapFragment.makeUrl();
+                                            naverMapFragment.del_marker(1);
                                             break;
                                         case 1:
-                                            naverMapFragment.makeUrl2();
+                                            naverMapFragment.del_marker(2);
                                             break;
                                         case 2:
-                                            naverMapFragment.makeUrl3(+127.100000,+128.890000,+34.100000,+39.100000);
+                                            naverMapFragment.del_marker(3);
                                             break;
                                         case 3:
-                                            naverMapFragment.makeUrl4(+127.100000,+128.890000,+34.100000,+39.100000);
+                                            naverMapFragment.del_marker(4);
                                             break;
                                     }
                                 }
-                            }.start();
+                           });
                         }
                     }
                 });
