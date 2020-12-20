@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         String address = getCurrentAddress(latitude, longitude); //위경도 기반 주소
 
-        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude + "\n주소:" + address, Toast.LENGTH_LONG).show();
+        //Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude + "\n주소:" + address, Toast.LENGTH_LONG).show();
 
         naverMapFragment = new NaverMapFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, naverMapFragment).commit();
@@ -410,12 +410,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        double longitude = gpsTracker.getLongitude(); //경도
 
         //이부분을 내가 못해서 느리게 지도가 뜨는것 같음
-        CameraPosition cameraPosition = new CameraPosition(
+/*        CameraPosition cameraPosition = new CameraPosition(
                 new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()),  // 위치 지정
                 15 // 줌 레벨
         );
         naverMap.setCameraPosition(cameraPosition);
-
+*/
 
     }
 

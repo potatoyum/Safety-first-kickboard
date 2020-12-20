@@ -1,5 +1,6 @@
 package com.example.safety_first_kickboard;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,8 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.naver.maps.geometry.LatLng;
+import com.naver.maps.map.CameraUpdate;
+import com.naver.maps.map.LocationSource;
 import com.naver.maps.map.MapView;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
@@ -37,14 +40,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.naver.maps.map.LocationTrackingMode.Face;
+import static com.naver.maps.map.LocationTrackingMode.Follow;
+import static com.naver.maps.map.LocationTrackingMode.NoFollow;
 
 
 public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
     private MapView mapView;
     NaverMap naverMap;
     FusedLocationSource locationSource;
+    NaverMap.OnLocationChangeListener onLocationChangeListener;
+
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     Double latitude, longitude, minlat, maxlat, minlon, maxlon;
+
+
     static List<Marker> markers1 = new ArrayList<Marker>(), markers2= new ArrayList<Marker>(), markers3= new ArrayList<Marker>(), markers4= new ArrayList<Marker>();
     //그냥 공공데이터 받아와서 출력 볼려고 만든 함수 이며 실제적으로 필요한 데이터 짤라서 저장하는건 parseData에서 실행
     // 1.지자체별 사고 다발 지역 정보
@@ -306,6 +315,10 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     Marker(type,Double.parseDouble(lat),Double.parseDouble(lng),name); //마커 생성
                 }
             }
+            Marker(1, 35.866298, 128.593480, "대구광역시 중구 덕산동(미사랑치과 인근)");
+            Marker(1, 35.865935, 128.593628, "대구광역시 중구 성내1동 (덕산한의원 인근)");
+            Marker(1, 35.8684606646585, 128.59342418350042, "대구광역시 중구 동성로3가(GS25 중앙제일점 인근)");
+
         }
         catch (Exception e){
             Log.d("service","Data parser error.");
@@ -374,6 +387,9 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     Marker(type,Double.parseDouble(lat),Double.parseDouble(lng),name); //마커 생성
                 }
             }
+            Marker(2, 35.868315, 128.593694, "대구광역시 중구 남일동(문화예술전용극장 인근)");
+            Marker(2, 35.86730198940656, 128.5929105571648, "대구광역시 중구 남성로 (쟁이벨리댄스 인근)");
+            Marker(2, 35.866954, 128.592562, "대구광역시 중구 성내2동(세창한의원 인근)");
         }
         catch (Exception e){
             Log.d("service","Data parser error.");
@@ -456,6 +472,10 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                 }
 
             }
+            Marker(3,35.863583, 128.595057, "도로포장공사");
+            Marker(3,35.865244, 128.594285, "도로확장공사");
+            Marker(3,35.866818, 128.594403, "도로보수공사");
+
         }
         catch (Exception e){
             Log.d("service","Data parser error.");
@@ -534,12 +554,16 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     Marker(type, Double.parseDouble(lat), Double.parseDouble(lng), name); //마커 생성
                 }
             }
+            Marker(4, 35.865610, 128.592504, "승용차 2중 추돌사고");
+            Marker(4, 35.864827, 128.593362, "화물차 2중 추돌사고");
+            Marker(4, 35.865462, 128.593770, "승용차 3중 추돌사고");
         }
         catch (Exception e){
             Log.d("service","Data parser error.");
             Log.e("service",e.toString());
         }
     }
+
 
     //마커생성 함수
     public void Marker(int type,double la,double lo,String name) {
@@ -708,7 +732,24 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
         naverMap.setLocationSource(locationSource);
         naverMap.getUiSettings().setLocationButtonEnabled(true); //현위치 버튼 활성화
         naverMap.setLocationTrackingMode(Face); //face모드로 위치 트래킹
-        naverMap.addOnLocationChangeListener(location -> Toast.makeText(getActivity(), location.getLatitude() +", " +location.getLongitude(), Toast.LENGTH_SHORT).show()); //위치이동되면 토스트 뜸
+
+
+
+        onLocationChangeListener = new NaverMap.OnLocationChangeListener() {
+            @Override
+            public void onLocationChange(@NonNull Location location) {
+                Toast.makeText(getActivity(), location.getLatitude() +", " +location.getLongitude(), Toast.LENGTH_SHORT).show();
+                CameraUpdate cameraUpdate = CameraUpdate.scrollTo(new LatLng(location.getLatitude(),location.getLongitude()));
+                //cameraUpdate.zoomTo(20);
+                getNaverMap().moveCamera(cameraUpdate);
+
+            }
+        };
+
+        naverMap.addOnLocationChangeListener(onLocationChangeListener);
+
+        //naverMap.moveCamera(cameraUpdate.
+ //위치이동되면 토스트 뜸
 
 
         //액티비티에서 읽은 값 여기서 마커찍기
