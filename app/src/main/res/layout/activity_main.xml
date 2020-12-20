@@ -30,4 +30,21 @@
         android:src="@drawable/checked"
         android:background="@android:color/white"
         android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/strart"
+        android:layout_width="1000px"
+        android:layout_height="125px"
+        android:gravity="center"
+        android:text="이용 시작"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="700dp"
+        android:textColor="@color/white"
+        android:background="@drawable/button_background"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:clickable="true"
+        android:onClick="onTextViewClicked"
+        />
+
 </FrameLayout>

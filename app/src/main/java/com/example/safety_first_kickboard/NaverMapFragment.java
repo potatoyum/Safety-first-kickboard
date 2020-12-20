@@ -1,25 +1,15 @@
 package com.example.safety_first_kickboard;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.MapView;
@@ -67,7 +57,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             urlBuilder.append("&"+URLEncoder.encode("siDo","UTF-8")+"=27");//시도코드(대구)
             urlBuilder.append("&"+URLEncoder.encode("guGun","UTF-8")+"=110");//시군구코드(중구)
             //  urlBuilder.append("&"+URLEncoder.encode("type","UTF-8")+"=json");
-            urlBuilder.append("&"+URLEncoder.encode("numOfRows","UTF-8")+"=10");//검색건수
+            urlBuilder.append("&"+URLEncoder.encode("numOfRows","UTF-8")+"=100");//검색건수
             urlBuilder.append("&"+URLEncoder.encode("pageNo","UTF-8")+"=1");
         }catch (Exception e){
             Log.d("service","ServiceKey error");
@@ -116,7 +106,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             urlBuilder.append("&"+URLEncoder.encode("siDo","UTF-8")+"=27");//시도코드(대구)
             urlBuilder.append("&"+URLEncoder.encode("guGun","UTF-8")+"=110");//시군구코드(중구)
             // urlBuilder.append("&"+URLEncoder.encode("type","UTF-8")+"=json");
-            urlBuilder.append("&"+URLEncoder.encode("numOfRows","UTF-8")+"=10");//검색건수
+            urlBuilder.append("&"+URLEncoder.encode("numOfRows","UTF-8")+"=50");//검색건수
             urlBuilder.append("&"+URLEncoder.encode("pageNo","UTF-8")+"=1");
         }catch (Exception e){
             Log.d("service","ServiceKey error");
@@ -590,7 +580,6 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     marker.setWidth(150);
                     marker.setHeight(150);
                     markers1.add(marker);
-                    System.out.println("마커1"+markers1);
                 }
                 else if(type == 2){
                     marker.setIconTintColor(b);
@@ -598,7 +587,6 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     marker.setWidth(150);
                     marker.setHeight(150);
                     markers2.add(marker);
-                    System.out.println("마커2"+markers2);
                 }
                 else if(type == 3)
                 {
@@ -607,7 +595,6 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     marker.setWidth(150);
                     marker.setHeight(150);
                     markers3.add(marker);
-                    System.out.println("마커3"+markers3);
                 }
                 else if(type == 4)
                 {
@@ -616,7 +603,6 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                     marker.setWidth(150);
                     marker.setHeight(150);
                     markers4.add(marker);
-                    System.out.println("마커4"+markers4);
                 }
 
             }
@@ -651,8 +637,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
                 switch (type){
                     case 1:
                         for(Marker marker : markers1){
-                            marker.setMap(null);
-                            System.out.println("테스트용"+markers1);}
+                            marker.setMap(null); }
                         break;
                     case 2:
                         for(Marker marker : markers2){
@@ -704,7 +689,7 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
             minlon = bundle.getDouble("minlon");
             maxlon = bundle.getDouble("maxlon");
         }
-         System.out.println("받는 : "+latitude+longitude+minlat+maxlat +minlon +maxlon);
+        System.out.println("받는 : "+latitude+longitude+minlat+maxlat +minlon +maxlon);
 
         mapView = (MapView) rootView.findViewById(R.id.naverMap);
         mapView.onCreate(savedInstanceState);
@@ -727,21 +712,22 @@ public class NaverMapFragment extends Fragment implements OnMapReadyCallback {
 
 
         //액티비티에서 읽은 값 여기서 마커찍기
-        new Thread(new Runnable() {
+        new Thread(){
             @Override
             public void run() {
-                    Log.d("service", "*****지자체*****");
-                    makeUrl();
-                    Log.d("service", "*****자전거*****");
-                    makeUrl2();
-                    Log.d("service", "**********공사**********");
-                    makeUrl3(+127.100000, +128.890000, +34.100000, +39.100000);
-                    Log.d("service", "**********사고**********");
-                    makeUrl4(+127.100000, +128.890000, +34.100000, +39.100000);
+                super.run();
+                Log.d("service","*****지자체*****");
+                makeUrl();
+                Log.d("service","*****자전거*****");
+                makeUrl2();
+                Log.d("service","**********공사**********");
+                makeUrl3(+127.100000,+128.890000,+34.100000,+39.100000); // 샘플
+                //makeUrl3(minlon,maxlon,minlat,maxlat); // 현 위치 기반
+                Log.d("service","**********사고**********");
+                makeUrl4(+127.100000,+128.890000,+34.100000,+39.100000); // 샘플
+                //makeUrl4(minlon,maxlon,minlat,maxlat); // 현 위치 기반
             }
-        }).start();
-
-
+        }.start();
     }
 
     public void setNaverMap(NaverMap naverMap) {

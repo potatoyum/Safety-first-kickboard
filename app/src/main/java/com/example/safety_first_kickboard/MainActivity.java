@@ -1,27 +1,17 @@
 package com.example.safety_first_kickboard;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,7 +25,6 @@ import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraPosition;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
-import com.naver.maps.map.overlay.Marker;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -155,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onClick(DialogInterface dialog, int which) {
                         int i;
                         String msg="";
+
                         for (Object temp : SelectedItems) {
 
                            runOnUiThread(new Runnable() {
@@ -188,6 +178,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
         builder.show();
+    }
+
+    //이용 시작 버튼 클릭 시
+    public void onTextViewClicked(View view){
+        //Toast.makeText(this,"위치 파악을 시작합니다.",Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder dlg = new AlertDialog.Builder(this);
+
+        dlg.setTitle("이용 시작"); //제목
+        dlg.setMessage("위치 파악을 시작합니다."); // 메시지
+
+        dlg.setPositiveButton("확인", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int id)
+            {
+                view.setVisibility(View.GONE);
+                //Toast.makeText(getApplicationContext(), "OK Click", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dlg.show();
     }
 
     //반경 m이내의 위도차(degree)
